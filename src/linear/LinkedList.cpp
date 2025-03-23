@@ -251,7 +251,10 @@ public:
 
     // get: O(N)
     T get(int index){
-        if(_size == 0){ return nullptr; }
+        if(index < 0 || index >= _size /*_size == 0)*/){
+            // Normal behaviour is to throw an error, not to return NULL
+            throw std::out_of_range("Error: index out of range");
+        }
         Node<T> * node = _head;
         // for(int i = 0; i < index; ++i, node = node->next){}
         while(index != 0){
