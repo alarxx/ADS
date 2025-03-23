@@ -16,6 +16,7 @@
 #include <type_traits> // enable_if_t
 #include <stdexcept> // runtime_error
 #include <algorithm> // swap
+#include <new> // bad_alloc
 
 /* --- iterator ---
     From https://github.com/alarxx/Tensor-library
@@ -144,12 +145,22 @@ public:
         }
     }
 
-    int size(){ return _size; }
+    int size(){
+        std::cout << "size()" << std::endl;
+        return _size;
+    }
 
     // --- Append ---
     // add: O(1)
     void addLast(T item){
+        /*
+         * Normally it should not throw an exception, only on Memory Allocation fails
+         * OutOfMemoryError in Java
+         * in C++ 'new' throws std::bad_alloc if memory allocation fails, use try{}catch(const std::bad_alloc& e){}
+         * in C malloc from <stdlib.h> returns NULL, so check if returned value is NULL in C
+         */
         Node<T> * new_node = new Node(item);
+
         if(_head == nullptr){
             std::cout << "initial" << std::endl;
             _head = new_node;
@@ -186,6 +197,10 @@ public:
     T removeLast(){
         std::cout << "remove last, _size = (" << _size  << " -> " << _size - 1 << ")" << std::endl;
 
+        if(_size == 0){
+            throw std::runtime_error("Error: cannot remove last, linked list is empty");
+        }
+
         Node<T> * tail = _tail;
         T data = tail->data;
 
@@ -208,6 +223,10 @@ public:
     // remove: O(1)
     T removeFirst(){
         std::cout << "remove first, _size = (" << _size  << " -> " << _size - 1 << ")" << std::endl;
+
+        if(_size == 0){
+            throw std::runtime_error("Error: cannot remove first, linked list is empty");
+        }
 
         Node<T> * head = _head;
         T data = head->data;
@@ -232,6 +251,7 @@ public:
 
     // get: O(N)
     T get(int index){
+        if(_size == 0){ return nullptr; }
         Node<T> * node = _head;
         // for(int i = 0; i < index; ++i, node = node->next){}
         while(index != 0){
@@ -268,7 +288,7 @@ public:
     using iterator = ::iterator<Node<T>>; // iterator variable shadowing, so we use :: - global namespace.
     // using iterator = ::iterator<T>;
     iterator begin(){ return iterator(_head); }
-    iterator end(){ return iterator(_tail->next); }
+    iterator end(){ return iterator(_tail != nullptr ? _tail->next : nullptr); }
     // ------
 };
 
@@ -284,15 +304,16 @@ int main(){
         // ll.addFirst(42 + i); // 42, 43, 44, 45, 46
     }
 
-    ll.removeLast();
-    // ll.removeFirst();
-
     // delete all:
-    // for(int i = 0; i < ll.size(); i++){
+    // std::cout << "\nClean example:" << std::endl;
+    // for(int n = ll.size(), i = 0; i < n; i++){ // 0 1 2 3 4 5
     //     ll.removeLast();
     // }
+    ll.removeLast(); // if deleted all then this should throw an exception
+    // ll.removeFirst();
 
     // O(N^2) = O(N) * O(N)
+    std::cout << "\nPrint all elements is O(N^2) example:" << std::endl;
     for(int i = 0; i < ll.size(); ++i){ // O(N)
         std::cout << ll.get(i) << std::endl; // O(N)
     }
