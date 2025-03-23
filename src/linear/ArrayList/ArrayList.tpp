@@ -10,10 +10,15 @@
     Copyright © 2025 Alar Akilbekov. All rights reserved.
  */
 
+#pragma once
+#ifndef _ARRAY_LIST_TPP_
+#define _ARRAY_LIST_TPP_
+
 #include <iostream>
 #include <iterator> // random_access_iterator_tag, reverse_iterator
 #include <cstddef> // ptrdiff_t
 
+namespace arraylist {
 
 /* --- iterator ---
     From https://github.com/alarxx/Tensor-library
@@ -107,7 +112,6 @@ public:
     friend bool operator >= (const iterator& a, const iterator& b){ return a._ptr >= b._ptr; }
 };
 
-
 // --- ArrayList in Java / <vector> in C++ ---
 template <typename T>
 class ArrayList {
@@ -166,7 +170,7 @@ private:
 public:
     // --- iterator ---
 
-    using iterator = ::iterator<T>; // iterator variable shadowing, so we use :: - global namespace.
+    using iterator = arraylist::iterator<T>; // iterator variable shadowing, so we use :: - global namespace.
     using reverse_iterator = std::reverse_iterator<iterator>;
     // using constant_iterator
     // using constant_reverse_iterator
@@ -177,35 +181,6 @@ public:
     reverse_iterator rend(){ return reverse_iterator(begin()); }
 };
 
+} // namespace ArrayList
 
-// --- main ---
-int main(){
-    // ArrayList<double> list; // list(5) by default, 2 times increaseBuffer
-    ArrayList<double> list(7);
-
-    // adding
-    int a = 42;
-    for(int i = 0; i < 10; i++){
-        list.add(a);
-        std::cout << i << ": " << a << std::endl;
-        a++;
-    }
-
-    std::cout << "\nfor loop with index operator example:" << std::endl;
-    for(int i = 0; i < list.size(); i++){
-        // std::cout << list.get(i) << std::endl;
-        list[i] *= 2; // purpose is to show that index return non-const variable
-        std::cout << list[i] << std::endl;
-    }
-
-    std::cout << "\nRange-based for loop with iterator example:" << std::endl;
-    for(auto & e: list){
-        e *= 2;
-        std::cout << e << std::endl;
-    }
-}
-
-/*
-Build and Run:
-g++ ArrayList.cpp -Wall -o ArrayList.o && ./ArrayList.o
-*/
+#endif
