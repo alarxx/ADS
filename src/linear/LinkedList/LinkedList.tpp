@@ -293,6 +293,12 @@ public:
         }
     }
 
+    void clean(){
+        for(int n = _size, i = 0; i < n; i++){ // 0 1 2 3 4 5
+            removeLast();
+        }
+    }
+
     // --- iterator ---
     using iterator = linkedlist::iterator<Node<T>>; // iterator variable shadowing, so we use :: - global namespace.
     // using iterator = ::iterator<T>;

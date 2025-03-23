@@ -11,7 +11,7 @@ int main(){
         // ll.addFirst(42 + i); // 42, 43, 44, 45, 46
     }
 
-    // delete all:
+    // delete all: ( ll.clean(); )
     // std::cout << "\nClean example:" << std::endl;
     // for(int n = ll.size(), i = 0; i < n; i++){ // 0 1 2 3 4 5
     //     ll.removeLast();
