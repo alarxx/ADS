@@ -112,12 +112,16 @@ public:
 template <typename T>
 class ArrayList {
 private:
+    // Actually, it would be better to initialize these constants outside class
+    static constexpr double INCREASE_FACTOR = 1.5;
+    static constexpr int INITIAL_CAPACITY = 5;
+
     T * _coeffs;
     int _size;
     int _capacity;
 
 public:
-    explicit ArrayList(int capacity = 5) : _size(0), _capacity(capacity) {
+    explicit ArrayList(int capacity = INITIAL_CAPACITY) : _size(0), _capacity(capacity) {
         _coeffs = new T[capacity];
     }
 
@@ -150,7 +154,7 @@ public:
 private:
     void _increaseBuffer(){
         std::cout << "_increaseBuffer function" << std::endl;
-        _capacity = (int) (1.5 * _capacity);
+        _capacity = (int) (INCREASE_FACTOR * _capacity);
         T * new_coeffs = new T[_capacity];
         for(int i = 0; i < _size; i++){
             new_coeffs[i] = _coeffs[i];
