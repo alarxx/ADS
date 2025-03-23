@@ -125,10 +125,11 @@ public:
     template <typename R>
     class Node {
     public:
-        R data;
+        R data; // copy, это просто, но можно реализовать и move semantics
         Node<R> * next;
         Node<R> * prev; // Doubly-Linked List + 8 bytes
         Node(R data) : data(data), next(nullptr), prev(nullptr) {}
+        // Получается сделать чтобы конструктор принимал только rvalue и красть данные
     };
 
 private:
@@ -144,7 +145,7 @@ public:
         Node<T> * next;
         // for(int i = 0; i < _size; i++){
         while(node != nullptr){
-            std::cout << "allocate Node{" << node->data << "}" << std::endl;
+            std::cout << "deallocate Node{" << typeid(node->data).name() << "}" << std::endl;
             next = node->next; // memorize
             delete node; node = nullptr;
             node = next;
@@ -157,15 +158,15 @@ public:
     }
 
     // --- Append ---
-    // add: O(1)
-    void addLast(T item){
+    // addLast: O(1)
+    T& addLast(Node<T> * new_node){
         /*
          * Normally it should not throw an exception, only on Memory Allocation fails
          * OutOfMemoryError in Java
          * in C++ 'new' throws std::bad_alloc if memory allocation fails, use try{}catch(const std::bad_alloc& e){}
          * in C malloc from <stdlib.h> returns NULL, so check if returned value is NULL in C
          */
-        Node<T> * new_node = new Node(item);
+        // Node<T> * new_node = new Node(item);
 
         if(_head == nullptr){
             std::cout << "initial" << std::endl;
@@ -179,10 +180,24 @@ public:
             // _tail->next = nullptr
         }
         ++_size;
+
+        return _tail->data;
     }
-    // add: O(1)
-     void addFirst(T item){
-        Node<T> * new_node = new Node(item);
+    T& addLast(T & lvalue){
+        // std::cout << "addLast(lvalue)" << std::endl;
+        Node<T> * new_node = new Node(lvalue);
+        return addLast(new_node);
+    }
+    T& addLast(T && rvalue){ // 1 rvalue object
+        // std::cout << "addLast(rvalue)" << std::endl;
+        T item = std::move(rvalue); // 1 object which is stealed
+        Node<T> * new_node = new Node(item); // 1 copy object
+        return addLast(new_node);
+    }
+
+    // addFirst: O(1)
+    T& addFirst(Node<T> * new_node){
+        // Node<T> * new_node = new Node(item);
         if(_head == nullptr){
             std::cout << "initial" << std::endl;
             _head = new_node;
@@ -195,12 +210,25 @@ public:
             // _head->prev = nullptr
         }
         ++_size;
+        return _head->data;
+    }
+    T& addFirst(T & lvalue){
+        // std::cout << "addFirst(lvalue)" << std::endl;
+        Node<T> * new_node = new Node(lvalue);
+        return addFirst(new_node);
+    }
+    T& addFirst(T && rvalue){ // +1 rvalue object
+        // std::cout << "addFirst(rvalue)" << std::endl;
+        T item = std::move(rvalue); // +1 "stealed" object
+        // conventionally std::move steals data if Rule of 5 is implemented, by default it copies
+        Node<T> * new_node = new Node(item); // +1 copy object
+        return addFirst(new_node);
     }
     // ------
 
     // --- Remove ---
     // remove: O(1)
-    T removeLast(){
+    T& removeLast(){
         std::cout << "remove last, _size = (" << _size  << " -> " << _size - 1 << ")" << std::endl;
 
         if(_size == 0){
@@ -208,7 +236,7 @@ public:
         }
 
         Node<T> * tail = _tail;
-        T data = tail->data;
+        T& data = tail->data;
 
         if(_size == 1){
             _head = nullptr;
@@ -227,7 +255,7 @@ public:
         return data;
     }
     // remove: O(1)
-    T removeFirst(){
+    T& removeFirst(){
         std::cout << "remove first, _size = (" << _size  << " -> " << _size - 1 << ")" << std::endl;
 
         if(_size == 0){
@@ -235,7 +263,7 @@ public:
         }
 
         Node<T> * head = _head;
-        T data = head->data;
+        T& data = head->data;
 
         if(_size == 1){
             _head = nullptr;
@@ -256,7 +284,7 @@ public:
     // ------
 
     // get: O(N)
-    T get(int index){
+    T& get(int index){
         if(index < 0 || index >= _size /*_size == 0)*/){
             // Normal behaviour is to throw an error, not to return NULL
             throw std::out_of_range("Error: index out of range");
