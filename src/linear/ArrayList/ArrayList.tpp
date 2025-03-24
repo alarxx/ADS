@@ -155,6 +155,28 @@ public:
         }
         _coeffs[_size++] = item; // post increment
     }
+
+    T removeLast(){ // O(1)
+        if(_size == 0){
+            throw std::out_of_range("ArrayList is empty, cannot remove last!");
+        }
+        T item = std::move(_coeffs[_size - 1]);
+        --_size;
+        return item;
+    }
+
+    T removeFirst(){ // O(N)
+        if(_size == 0){
+            throw std::out_of_range("ArrayList is empty, cannot remove first!");
+        }
+        T item = std::move(_coeffs[0]);
+        for(int i = 0; i < _size - 1; i++){
+            _coeffs[i] = _coeffs[i + 1];
+        }
+        --_size;
+        return item;
+    }
+
 private:
     void _increaseBuffer(){
         std::cout << "_increaseBuffer function" << std::endl;
