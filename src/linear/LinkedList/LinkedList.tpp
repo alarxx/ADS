@@ -125,19 +125,20 @@ public:
     template <typename R>
     class Node {
     public:
-        R data; // copy, это просто, но можно реализовать и move semantics
+        R data;
         Node<R> * next;
         Node<R> * prev; // Doubly-Linked List + 8 bytes
+        // Простым решением было бы сделать конструктор с pass-by-value и всегда создавать копию:
         // Node(R data) : data(data), next(nullptr), prev(nullptr) {}
-        // Получается сделать чтобы конструктор принимал только rvalue и красть данные
-        Node() = delete;
-        Node(R & data) = delete;
+        // Получается единственный конструктор принимает rvalue и крадет данные, не созадавая лишних копий
+        Node() = delete; // Когда может понадобиться запоздалый assignment data?
+        Node(R & data) = delete; // Передавать reference точно плохая идея (извне могут удалить объект), лучше Node будет полным обладателем data
         Node(R && rvalue) : data(std::move(rvalue)), next(nullptr), prev(nullptr) {}
         // Rule of 5
-        ~Node() = default;
-        Node(Node & other) = delete;
+        ~Node() = default; // можно было бы сделать цепное удаление next, но пусть Node будет максимально простым
+        Node(Node & other) = delete; // можно было бы разрешить копирование, но зачем копировать Node и data лишний раз
         Node & operator = (Node & other) = delete;
-        Node(Node && other) = delete;
+        Node(Node && other) = delete; // move semantics для Node никогда не понадобится
         Node & operator = (Node && other) = delete;
     };
 
@@ -150,6 +151,10 @@ public:
     explicit LinkedList() : _head(nullptr), _tail(nullptr), _size(0) {}
 
     ~LinkedList(){
+        /*
+         * Можно было бы реализовать цепочную реакцию удаления:
+         * if(_head != nullptr){ delete _head; _head = nullptr; _tail = nullptr; }
+         */
         Node<T> * node = _head;
         Node<T> * next;
         // for(int i = 0; i < _size; i++){
