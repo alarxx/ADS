@@ -310,6 +310,9 @@ public:
         return node->data;
     }
 
+    T& getFirst(){ return _head != nullptr ? _head->data : nullptr; }
+    T& getLast(){ return _tail != nullptr ? _tail->data : nullptr; }
+
     int find(const T item){
         Node<T> * node = _head;
         for(int i = 0; /*i < _size*/ node != nullptr; ++i){
