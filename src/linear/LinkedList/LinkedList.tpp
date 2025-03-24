@@ -240,7 +240,7 @@ public:
 
     // --- Remove ---
     // remove: O(1)
-    T& removeLast(){
+    T removeLast(){
         std::cout << "remove last, _size = (" << _size  << " -> " << _size - 1 << ")" << std::endl;
 
         if(_size == 0){
@@ -248,7 +248,7 @@ public:
         }
 
         Node<T> * tail = _tail;
-        T& data = tail->data;
+        T data = std::move(tail->data);
 
         if(_size == 1){
             _head = nullptr;
@@ -267,7 +267,7 @@ public:
         return data;
     }
     // remove: O(1)
-    T& removeFirst(){
+    T removeFirst(){
         std::cout << "remove first, _size = (" << _size  << " -> " << _size - 1 << ")" << std::endl;
 
         if(_size == 0){
@@ -275,7 +275,7 @@ public:
         }
 
         Node<T> * head = _head;
-        T& data = head->data;
+        T data = std::move(head->data);
 
         if(_size == 1){
             _head = nullptr;
