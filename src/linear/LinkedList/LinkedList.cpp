@@ -10,23 +10,23 @@ public:
     Data() = default;
     Data(double value) : value(value) {}
     Data(Data & other){
-        std::cout << "Data Copy Constructor" << std::endl;
+        // std::cout << "Data Copy Constructor" << std::endl;
         value = other.value;
     }
     Data & operator = (Data & other){
-        std::cout << "Data Copy Assignment Operator" << std::endl;
+        // std::cout << "Data Copy Assignment Operator" << std::endl;
         if(this != &other){
             value = other.value;
         }
         return *this;
     }
 	Data(Data && other){
-        std::cout << "Data Move Constructor" << std::endl;
+        // std::cout << "Data Move Constructor" << std::endl;
         value = other.value;
         other.value = 0;
     }
 	Data & operator = (Data && other){
-        std::cout << "Data Move Assignment Operator" << std::endl;
+        // std::cout << "Data Move Assignment Operator" << std::endl;
         if(this != &other){
             value = other.value;
             other.value = 0;
@@ -63,17 +63,9 @@ int main(){
 
     LinkedList<Data> ll;
     for(int i = 0; i < 5; ++i){
-        Data d;
-        d.value = 42. + i;
-        // ll.addLast(d); // lvalue
-        ll.addLast(std::move(d)); // rvalue, steals fields
-        // ll.addLast( Data(42. + i) ); // rvalue
-        std::cout << "d.value: " << d.value << std::endl;
-
-        std::cout << ll.get(i).value << std::endl;
-
-        // Data& t = ll.addLast(d); // 42, 43, 44, 45, 46
-        // t.value *= 2; // 84 86 88 90 92
+        Data& t = ll.addLast( Data(42. + i) ); // 42, 43, 44, 45, 46
+        t.value *= 2; // 84 86 88 90 92
+        std::cout << ll.get(i).value << std::endl; // O(N)
     }
 
     std::cout << "\nRange-based for loop example:" << std::endl;
