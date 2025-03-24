@@ -6,23 +6,70 @@ class Data {
 public:
     double value;
     // ~Data(){ std::cout << "~Data {" << value << "}" << std::endl; }
+
+    Data() = default;
+    Data(double value) : value(value) {}
+    Data(Data & other){
+        std::cout << "Data Copy Constructor" << std::endl;
+        value = other.value;
+    }
+    Data & operator = (Data & other){
+        std::cout << "Data Copy Assignment Operator" << std::endl;
+        if(this != &other){
+            value = other.value;
+        }
+        return *this;
+    }
+	Data(Data && other){
+        std::cout << "Data Move Constructor" << std::endl;
+        value = other.value;
+        other.value = 0;
+    }
+	Data & operator = (Data && other){
+        std::cout << "Data Move Assignment Operator" << std::endl;
+        if(this != &other){
+            value = other.value;
+            other.value = 0;
+        }
+        return *this;
+    }
+};
+
+struct A {
+    Data data;
+    A() = delete;
+    A(Data && rvalue) : data(std::move(rvalue)) {}
 };
 
 int main(){
-    // Data a {.value = 42.};
-    // Data b = std::move(a);
-    // b.value += 1;
-    // std::cout << "a: " << a.value << std::endl;
-    // std::cout << "b: " << b.value << std::endl;
+//     Data data = 42.;
+//     // Copy with reference:
+//     // Data& ref = data;
+//     // Data copy = ref;
+//     // copy.value *= 2;
+//     // std::cout << "copy: " << copy.value << std::endl;
+//
+//     // Move:
+//     // Data b = std::move(data);
+//     // b.value += 1;
+//     // std::cout << "data: " << data.value << std::endl;
+//     // std::cout << "b: " << b.value << std::endl;
+//
+//     // Constructor with rvalue should steal fields
+//     A a = std::move(a);
+//     a.data.value++;
+//     std::cout << "data: " << data.value << std::endl;
+//     std::cout << "a: " << a.data.value << std::endl;
 
     LinkedList<Data> ll;
     for(int i = 0; i < 5; ++i){
-        // Data d;
-        // d.value = 42. + i;
-        // ll.addLast(d);
-        // std::cout << d.value << std::endl;
+        Data d;
+        d.value = 42. + i;
+        // ll.addLast(d); // lvalue
+        ll.addLast(std::move(d)); // rvalue, steals fields
+        // ll.addLast( Data(42. + i) ); // rvalue
+        std::cout << "d.value: " << d.value << std::endl;
 
-        ll.addLast( Data({ .value = 42. + i }) );
         std::cout << ll.get(i).value << std::endl;
 
         // Data& t = ll.addLast(d); // 42, 43, 44, 45, 46

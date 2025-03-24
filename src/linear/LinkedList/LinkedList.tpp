@@ -128,8 +128,11 @@ public:
         R data; // copy, это просто, но можно реализовать и move semantics
         Node<R> * next;
         Node<R> * prev; // Doubly-Linked List + 8 bytes
-        Node(R data) : data(data), next(nullptr), prev(nullptr) {}
+        // Node(R data) : data(data), next(nullptr), prev(nullptr) {}
         // Получается сделать чтобы конструктор принимал только rvalue и красть данные
+        Node() = delete;
+        Node(R & data) = delete;
+        Node(R && rvalue) : data(std::move(rvalue)), next(nullptr), prev(nullptr) {}
     };
 
 private:
@@ -183,15 +186,16 @@ public:
 
         return _tail->data;
     }
-    T& addLast(T & lvalue){
+    T& addLast(T & lvalue){ // 1 copy
         // std::cout << "addLast(lvalue)" << std::endl;
-        Node<T> * new_node = new Node(lvalue);
+        T item = lvalue; // copy
+        Node<T> * new_node = new Node(std::move(item));
         return addLast(new_node);
     }
-    T& addLast(T && rvalue){ // 1 rvalue object
+    T& addLast(T && rvalue){ // 0 copy, 1 rvalue object
         // std::cout << "addLast(rvalue)" << std::endl;
-        T item = std::move(rvalue); // 1 object which is stealed
-        Node<T> * new_node = new Node(item); // 1 copy object
+        // T item = std::move(rvalue); // 1 object which is stealed
+        Node<T> * new_node = new Node(std::move(rvalue)); // 1 copy object
         return addLast(new_node);
     }
 
@@ -213,15 +217,12 @@ public:
         return _head->data;
     }
     T& addFirst(T & lvalue){
-        // std::cout << "addFirst(lvalue)" << std::endl;
-        Node<T> * new_node = new Node(lvalue);
+        T item = lvalue; // copy
+        Node<T> * new_node = new Node(std::move(item));
         return addFirst(new_node);
     }
-    T& addFirst(T && rvalue){ // +1 rvalue object
-        // std::cout << "addFirst(rvalue)" << std::endl;
-        T item = std::move(rvalue); // +1 "stealed" object
-        // conventionally std::move steals data if Rule of 5 is implemented, by default it copies
-        Node<T> * new_node = new Node(item); // +1 copy object
+    T& addFirst(T && rvalue){
+        Node<T> * new_node = new Node(std::move(rvalue));
         return addFirst(new_node);
     }
     // ------
