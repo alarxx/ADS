@@ -17,24 +17,41 @@
 
 using heap::Heap;
 
-int main(){
-    std::cout << "hi" << std::endl;
+// int main(){
+//     std::cout << "hi" << std::endl;
+//
+//     Heap<double> heap;
+//     for(int i = 3; i >= 0; i--){ // O(N*log(N))
+//         heap.insert(42. + i);
+//     }
+//
+//     double item = heap.extractMin();
+//     std::cout << "Min: " << item << std::endl;
+//
+//     // print
+//     ArrayList<double>& list = heap.data();
+//     for(int i = 0; i < list.size(); i++){
+//         std::cout << "print: " << list[i] << std::endl;
+//     }
+//
+//     std::cout << "Min: " << heap.getMin() << std::endl;
+// }
 
-    Heap<double> heap;
-    for(int i = 3; i >= 0; i--){ // O(N*log(N))
-        heap.insert(42. + i);
+int main(){
+
+    std::vector<double> vec;
+    for(int i = 0; i < 5; i++){
+        vec.emplace_back(42. + (4 - i));
+        std::cout << vec[i] << std::endl;
     }
 
-    double item = heap.extractMin();
-    std::cout << "Min: " << item << std::endl;
-
+    Heap<double> heap;
+    heap.buildHeap(vec);
     // print
     ArrayList<double>& list = heap.data();
     for(int i = 0; i < list.size(); i++){
         std::cout << "print: " << list[i] << std::endl;
     }
-
-    std::cout << "Min: " << heap.getMin() << std::endl;
 }
 
 /*

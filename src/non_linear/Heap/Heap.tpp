@@ -17,6 +17,7 @@
 #include <iostream> // cout, endl
 #include <algorithm> // swap, min/max
 #include <stdexcept> // out_of_range, runtime_error
+#include <vector> // vector
 
 // src/non_linear/Heap/main.cpp
 #include "../../linear/ArrayList/ArrayList.tpp"
@@ -99,6 +100,25 @@ public:
         traverseUp(list.size() - 1);
     }
 
+    void buildHeap(std::vector<T>& vec){
+        list.clean();
+        list.add(T());
+
+        for(unsigned long int i = 0; i < vec.size(); i++){
+            list.add(vec[i]);
+        }
+
+        // print
+        for(int i = 0; i < list.size(); i++){
+            std::cout << "print: " << list[i] << std::endl;
+        }
+
+        for(int i = parentOf(size() - 1); i > 0; i --){
+            std::cout << "--- heapify: " << i << " ---" << std::endl;
+            heapify(i);
+        }
+    }
+
     bool empty(){ return list.size() == 0; }
     int size(){ return list.size(); }
 
@@ -122,8 +142,13 @@ private:
         int right = rightChildOf(root);
 
         std::cout << "root: " << root << ", value: " << list[root] << std::endl;
-        std::cout << "left: " << left << ", value: " << list[left] << std::endl;
+        std::cout << "left: " << left << ", value: " << list[left] << (left >= (list.size() - 1) ? " (X)" : "") << std::endl;
         std::cout << "right: " << right << ", value: " << list[right] << (right >= list.size() ? " (X)" : "") << std::endl;
+
+        if(left >= list.size() - 1){
+            std::cout << "I have no childs!" << std::endl;
+            return;
+        }
 
         int minChild = right >= list.size() ? left : list[left] < list[right] ? left : right;
 
