@@ -130,8 +130,20 @@ public:
     }
 
     ~ArrayList(){
-        delete[] _coeffs;
+        if(_coeffs != nullptr){
+            delete[] _coeffs;
+        }
         _coeffs = nullptr;
+    }
+
+    void clean(){
+        if(_coeffs != nullptr){
+            delete[] _coeffs;
+        }
+        _coeffs = nullptr;
+        _size = 0;
+        _capacity = INITIAL_CAPACITY;
+        _coeffs = new T[_capacity];
     }
 
     int size() const { return _size; }
