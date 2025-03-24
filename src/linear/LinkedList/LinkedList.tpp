@@ -133,6 +133,12 @@ public:
         Node() = delete;
         Node(R & data) = delete;
         Node(R && rvalue) : data(std::move(rvalue)), next(nullptr), prev(nullptr) {}
+        // Rule of 5
+        ~Node() = default;
+        Node(Node & other) = delete;
+        Node & operator = (Node & other) = delete;
+        Node(Node && other) = delete;
+        Node & operator = (Node && other) = delete;
     };
 
 private:

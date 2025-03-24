@@ -68,6 +68,9 @@ int main(){
         std::cout << ll.get(i).value << std::endl; // O(N)
     }
 
+    for(auto & e : ll){ // e is Node&, you cannot create copy of Node
+        e.data.value *= 2;
+    }
     std::cout << "\nRange-based for loop example:" << std::endl;
     for(auto & e : ll){ // e is Node&
         std::cout << e.data.value << std::endl;
