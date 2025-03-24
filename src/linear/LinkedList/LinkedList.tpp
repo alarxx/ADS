@@ -310,8 +310,18 @@ public:
         return node->data;
     }
 
-    T& getFirst(){ return _head != nullptr ? _head->data : nullptr; }
-    T& getLast(){ return _tail != nullptr ? _tail->data : nullptr; }
+    T& getFirst(){
+        if(_head == nullptr){
+            throw std::runtime_error("Error: can't get first, linked list is empty");
+        }
+        return _head->data;
+    }
+    T& getLast(){
+        if(_tail == nullptr){
+            throw std::runtime_error("Error: can't get last, linked list is empty");
+        }
+        return _tail->data;
+    }
 
     int find(const T item){
         Node<T> * node = _head;
