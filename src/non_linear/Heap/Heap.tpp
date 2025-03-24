@@ -78,12 +78,15 @@ public:
         list.add(T());
     }
 
+    // O(1)
     T& getMin(){
         if(list.size() == 0){
             throw std::out_of_range("Heap is empty!");
         }
         return list[1];
     }
+
+    // O(log(N))
     T extractMin(){
         // get 1
         T& ref = getMin();
@@ -94,16 +97,26 @@ public:
         heapify();
         return item;
     }
+
+    // O(log(N))
     void insert(T item){
         list.add(item);
         std::cout << " --- Insert " << item << " ---" << std::endl;
         traverseUp(list.size() - 1);
     }
 
+    /*
+
+        O(N * log(N))
+
+        O(N) + O(N/2) * O(log(N)) = O(N * log(N))
+
+     */
     void buildHeap(std::vector<T>& vec){
         list.clean();
         list.add(T());
 
+        // O(N)
         for(unsigned long int i = 0; i < vec.size(); i++){
             list.add(vec[i]);
         }
@@ -113,9 +126,10 @@ public:
             std::cout << "print: " << list[i] << std::endl;
         }
 
-        for(int i = parentOf(size() - 1); i > 0; i --){
+        // O(N * log(N))
+        for(int i = parentOf(size() - 1); i > 0; i --){ // O(N/2)
             std::cout << "--- heapify: " << i << " ---" << std::endl;
-            heapify(i);
+            heapify(i); // O(log(N))
         }
     }
 
@@ -131,6 +145,7 @@ private:
     int parentOf(int index){ return index / 2; }
 
     // traverseDown
+    // O(log(N))
     void heapify(int index = 1){
         int root = index;
         if(root >= list.size() - 1){
@@ -159,6 +174,7 @@ private:
         heapify(minChild);
     }
 
+    // O(log(N))
     void traverseUp(int index){
         int root = parentOf(index);
         if(root <= 0 /*never less actually*/ ){
@@ -182,6 +198,7 @@ private:
         traverseUp(root);
     }
 
+    // O(1)
     void swap(int index1, int index2){
         std::swap(list[index1], list[index2]);
     }
