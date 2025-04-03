@@ -7,5 +7,7 @@ Some refer it as Data Structures and Algorithms (DSA).
 
 pic ref: https://dotnettutorials.net/lesson/physical-vs-logical-data-structure/
 
+---
+
 # References
 - Sedgewick, R., & Wayne, K. (2011). Algorithms. Addison-wesley professional.
