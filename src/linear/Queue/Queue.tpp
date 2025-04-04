@@ -70,10 +70,10 @@ public:
 
     // --- REMOVE ---
     T pop(){
-        return list.removeLast(); // RVO
+        return list.removeLast(); // RVO, 1 move
     }
 
-    std::optional<T> poll(){ // here though std::optional moves data because removeFirst returns T which is like rvalue
+    std::optional<T> poll(){ // 2 moves, here though std::optional moves data because removeFirst returns T which is like rvalue
         try{
             return list.removeLast(); // returns T
         } catch(...){
