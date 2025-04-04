@@ -63,12 +63,18 @@ int main(){
 
     LinkedList<Data> ll;
     for(int i = 0; i < 5; ++i){
+        /*
+            LinkedList::Node единственный кто будет хранить lvalue значение Data,
+            При этом копия будет создаваться только, если передать lvalue Data.
+            В общем, тут хитрая оптимизация хранение объекта в Node.
+            Node должен хранить lvalue значение объекта, не reference объекта, и не pointer на объект.
+        */
         Data& t = ll.addLast( Data(42. + i) ); // 42, 43, 44, 45, 46
         t.value *= 2; // 84 86 88 90 92
         std::cout << ll.get(i).value << std::endl; // O(N)
     }
 
-    Data ddd = ll.removeFirst();
+    Data ddd = ll.removeFirst(); // In Stack Memory, so it will free automatically
     std::cout << "removed ddd: " << ddd.value << std::endl;
 
     // for(auto & e : ll){ // e is Node&, you cannot create copy of Node
@@ -76,7 +82,7 @@ int main(){
     // }
     std::cout << "\nRange-based for loop example:" << std::endl;
     for(auto & e : ll){ // e is Node&
-        std::cout << e.data.value << std::endl;
+        std::cout << e.value << std::endl;
     }
 
     std::cout << "--- LinkedList.cpp execution ended! ---" << std::endl;
