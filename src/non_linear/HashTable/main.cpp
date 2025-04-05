@@ -60,6 +60,8 @@ int main(){
 
         table.put("_2", 22);
 
+        std::cout << "\n--- (start) main print example: --- " << std::endl;
+
         // print values
         for(int i = 1; i <= 10; ++i){
             std::string key = "_" + std::to_string(i);

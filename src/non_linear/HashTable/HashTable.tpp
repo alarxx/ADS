@@ -86,6 +86,7 @@ public:
         HashNode(K_ key, V_ value) : key(key), value(value) {
             // std::cout << "HashNode Constructor: " << value << std::endl;
         }
+        ~HashNode(){ std::cout << "HashNode Destructor: " << value << std::endl; }
     };
 
     std::hash<K> hash_fn;
@@ -95,7 +96,7 @@ public:
     int load; // (Load Factor) сколько bucket-ов заполнено в chainArray
 
     // rehash if load_factor > 0.75
-    double load_factor(){ return (double) load / capacity; }
+    double load_factor(){ return (double) load / (double) capacity; }
 
     std::list<HashNode<K, V>> * chainArray; // buckets - array of singly-linked lists of HashNodes<K, V> (chains)
 
@@ -124,7 +125,7 @@ public:
     }
 
     V& put(const K& key, const V& value) {
-        if(load_factor() > 0.75){
+        if(load_factor() > 0.75 /* || true */){
             rehash();
         }
 
@@ -212,8 +213,37 @@ public:
     }
 
     void rehash(){
+        std::cout << "rehash" << std::endl;
         // capacity = (int) (1.5 * capacity); // min
         // why to use prime number as capacity?
+
+        int prev_capacity = capacity;
+
+        load = 0;
+        N = 0;
+        capacity = (int) (1.5 * capacity);
+
+        // HashTable<K, V> _table((int) (1.5 * capacity));
+        std::list<HashNode<K, V>> * _chainArray = new std::list<HashNode<K, V>>[capacity];
+
+        // traverse and c
+        for(int i = 0; i < prev_capacity; i++){
+            std::list<HashNode<K, V>>& bucket = chainArray[i];
+            for (auto & node : bucket) {
+                int j = hash(node.key);
+
+                std::list<HashNode<K, V>>& _bucket = _chainArray[j];
+
+                if(_bucket.empty()){ ++load; }
+                _bucket.emplace_back(node.key, node.value);
+                ++N;
+            }
+        }
+
+        std::list<HashNode<K, V>> * tmp = chainArray;
+        chainArray = _chainArray;
+        delete[] tmp;
+
     }
 };
 
