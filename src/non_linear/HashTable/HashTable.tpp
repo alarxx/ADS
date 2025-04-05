@@ -11,8 +11,8 @@
  */
 
 #pragma once
-#ifndef _HEAP_TPP_
-#define _HEAP_TPP_
+#ifndef _HASH_TABLE_TPP_
+#define _HASH_TABLE_TPP_
 
 #include <iostream>
 #include <stdexcept> // runtime_error, out_of_range
