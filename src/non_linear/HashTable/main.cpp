@@ -3,6 +3,8 @@
 
 #include "HashTable.tpp"
 
+#include "dev/random/random.hpp"
+
 /*
     Value must be Default Constructable
     Because table[key] creates new default Value object if key isn't in the table
@@ -36,16 +38,27 @@ int main(){
 
      /* Uniform Distribution */ {
         std::cout << "\n--- Distribution: --- " << std::endl;
+        Random<int> rand(1, 1000);
         int pool[capacity];
         for(int & i : pool){ i = 0; }
-        for(int i = 1; i <= capacity * 10000; ++i){
-            std::string key = "_" + std::to_string(i);
+        for(int i = 1; i <= capacity * 100000; ++i){ // на каждый bucket должно быть примерно по 100.000 элементов
+            std::string key = "_" + std::to_string(rand());
             int bucket = table.hash(key);
             pool[bucket]++;
         }
         for(int i = 0; i < capacity; i++){
-            std::cout << i << ": " << pool[i] / (double) (capacity * 10000)  << std::endl;
+            std::cout << i << ": " << pool[i] / (double) (capacity * 100000)  << std::endl;
         }
+        /*
+            Проверка равномерно ли распределяет хэширование
+
+            0: 0.332537
+            1: 0.350303
+            2: 0.31716
+
+            Почему-то на 1 выпадает больше.
+            Похоже на равномерное, но не идеально равномерное распределение почему-то.
+        */
     }
 
     /* Main Example : */ {
@@ -103,7 +116,7 @@ int main(){
 /*
 
 - [x] load_factor
-- [ ] rehash
+- [x] rehash
 - [ ] reserve
 
 */
