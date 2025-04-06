@@ -60,11 +60,12 @@ template <typename T>
 concept Hashable = requires(T a) {
     { std::hash<T>{}(a) } -> std::convertible_to<std::size_t>;
     { a == a } -> std::convertible_to<bool>;
-} && std::is_default_constructible_v<std::hash<T>>;
+    std::is_default_constructible_v<std::hash<T>>;
+};
 
 template <typename T>
 concept DefaultConstructable = /*std::is_default_constructible_v<T>*/ requires {
-    T{}; // проверка, что тип можно создать без параметров
+    T{}; // Проверка, что тип можно создать без параметров. Нужно в operator[], когда ключа нет, мы создаем default-ный объект.
 };
 
 
@@ -82,7 +83,7 @@ concept DefaultConstructable = /*std::is_default_constructible_v<T>*/ requires {
 
 
     Когда увеличивать hash table?
-    if load factor > 0.75, пофиг на кол-во в бакете, we assume our hash function ranges Uniform Distribution
+    if load factor > 0.75, без разницы на кол-во в бакете, we assume our hash function ranges Uniform Distribution
 
     0: {3}, {6}
     1: {1}, {4}
