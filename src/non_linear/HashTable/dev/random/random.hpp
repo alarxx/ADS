@@ -26,6 +26,7 @@ public:
         random_device - источник энтропии
         random_device seeds mt19937
         random_device generates random number, but it is expensive operation
+        поэтому не нужно использовать rd(), как генератор
     */
     Random(IntType min, IntType max) : uniform(min, max), mt_gen(std::random_device{}()) {}
     IntType random(){ return uniform(mt_gen); }
