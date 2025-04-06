@@ -29,7 +29,33 @@
 // Использование стандартной библиотеки сделает этот пример атомарным
 #include <list>
 
-// https://en.cppreference.com/w/cpp/utility/hash
+/*
+    See : `./dev/hash.cpp` for specialization of std::hash<T> for custom T class.
+
+    ------
+
+    https://en.cppreference.com/w/cpp/utility/hash
+
+    std::hash<T>() -> std::size_t
+
+    std::hash<T> используется в:
+    - std::unordered_set
+    - std::unordered_multiset
+    - std::unordered_map
+    - std::unordered_multimap
+
+    - If k1 == k2 is true, h(k1) == h(k2) is also true.
+    - Unless std::hash<Key> is a program-defined specialization, h(k1) will never throw an exception.
+
+    Custom specialization of std::hash can be injected in namespace std.
+    Hash:
+        FunctionObject,
+        CopyConstructible,
+        Destructible
+    Default Constructable
+    Copy Assignable
+    Swappable
+*/
 template <typename T>
 concept Hashable = requires(T a) {
     { std::hash<T>{}(a) } -> std::convertible_to<std::size_t>;
