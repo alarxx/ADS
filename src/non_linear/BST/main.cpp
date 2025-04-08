@@ -34,23 +34,25 @@ int main(){
     //     bst.insert(std::to_string(i), i);
     // }
 
+    // [1, 7]
     bst.insert("6", 6);
     bst.insert("4", 4);
     bst.insert("5", 5);
     bst.insert("7", 7);
-    bst.insert("3", 3);
     bst.insert("2", 2);
+    bst.insert("1", 1);
+    bst.insert("3", 3);
 
     std::cout << "\n--- Initial BST: ---" << std::endl;
     bst.vprint(); // sorted by key values
     std::cout << "Height: " << bst.get_height() << std::endl;
 
-    bst.get_min() = 22; // set value
-    bst.get_max() = 66;
+    bst.get_min() = 11; // set value
+    bst.get_max() = 77;
 
     std::cout << "\n--- Delete Node example: ---" << std::endl;
     // bst.remove("3"); // you will see 2 destructors of node {"3", 3}
-    auto d = bst.remove("3"); // BST<std::string, int>::Node<std::string, int>
+    auto d = bst.remove("2"); // BST<std::string, int>::Node<std::string, int>
     std::cout << "deleted: " << d.value << std::endl;
 
     std::cout << "\n--- Inorder traversal example: ---" << std::endl;

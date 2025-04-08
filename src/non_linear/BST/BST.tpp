@@ -331,22 +331,27 @@ public:
         else {
             replacement = node->right; // not nullptr
 
-            while(replacement->left != nullptr){
-                Node<K, V> * prev = replacement;
+            if(replacement->left == nullptr){
+                replacement->left = node->left;
+            }
+            else {
+                while(replacement->left != nullptr){
+                    Node<K, V> * prev = replacement;
 
-                replacement = replacement->left; // not nullptr
+                    replacement = replacement->left; // not nullptr
 
-                if(replacement->left == nullptr){
-                    prev->left = replacement->right; // replacement->right or nullptr
+                    if(replacement->left == nullptr){
+                        prev->left = replacement->right; // replacement->right or nullptr
 
-                    // replacement->right = nullptr;
-                    // replacement->left = nullptr; // already nullptr
+                        replacement->right = nullptr;
+                        // replacement->left = nullptr; // already nullptr
 
-                    replacement->left = node->left;
-                    replacement->right = node->right;
-                    node->left = nullptr;
-                    node->right = nullptr;
-                    // break; // no need, it will break
+                        replacement->left = node->left;
+                        replacement->right = node->right;
+                        node->left = nullptr;
+                        node->right = nullptr;
+                        // break; // no need, it will break
+                    }
                 }
             }
         }
