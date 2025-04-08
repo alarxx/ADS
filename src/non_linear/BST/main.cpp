@@ -7,7 +7,8 @@
 #include "../../utils/random/random.hpp"
 
 int main(){
-    std::cout << "BST" << std::endl;
+    std::cout << "--- BST/main.cpp execution started! ---" << std::endl;
+
     // std::string str = "1";
     // std::cout << (str > "2") << std::endl;
     // std::cout << (str == "1") << std::endl;
@@ -45,13 +46,18 @@ int main(){
     bst.get_min() = 22; // set value
     bst.get_max() = 66;
 
+    std::cout << "\n--- Delete Node example: ---" << std::endl;
+    // bst.remove("3"); // you will see 2 destructors of node {"3", 3}
     auto d = bst.remove("3"); // BST<std::string, int>::Node<std::string, int>
     std::cout << "deleted: " << d.value << std::endl;
 
+    std::cout << "\n--- Inorder traversal example: ---" << std::endl;
     bst.inorder_traversal(); // sorted by key values
 
     std::cout << "\n--- BST after manipulations: ---" << std::endl;
     bst.hprint(); // sorted by key values
+
+    std::cout << "\n--- BST/main.cpp execution ended! ---" << std::endl;
 }
 
 /*

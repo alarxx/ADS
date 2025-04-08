@@ -58,11 +58,30 @@ public:
         */
         Node(const K_ & key, const V_ & value) : key(key), value(value) {} // 1 copy
         Node(const K_ && key, const V_ && value) = delete;
+        ~Node(){
+            std::cout << "Node Destructor: key = " << key << ", value = " << value << std::endl;
+        }
     };
 
     Node<K, V> * root;
 
     BST() : root(nullptr) {}
+
+    ~BST() {
+        std::stack<Node<K, V>*> stack;
+        stack.push(root);
+        while(!stack.empty()){
+            Node<K, V> * node = stack.top();
+            stack.pop();
+            if(node->left != nullptr){
+                stack.push(node->left);
+            }
+            if(node->right != nullptr){
+                stack.push(node->right);
+            }
+            delete node;
+        }
+    }
 
     Node<K, V>& insert(const K && key, const V && value){
         return insert(key, value); // передаем как lvalue, потому что key и value - имена переменных
@@ -253,10 +272,10 @@ public:
             parent->right = replacement;
         }
 
-        Node<K, V> d = std::move(*node);
+        Node<K, V> d = std::move(*node); // d is stealed Node in Stack Memory, so it will automatically freed
         delete node;
 
-        return d;
+        return d; // RVO
     }
 
 };
