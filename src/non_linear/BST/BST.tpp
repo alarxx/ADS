@@ -96,6 +96,9 @@ public:
 
     Node<K, V>& get(const K && key){ return get(key); }
     Node<K, V>& get(const K & key){
+        if(root == nullptr){
+            throw std::out_of_range("Error: BST is empty!");
+        }
         // traverse until key == node.key
         Node<K, V> * node = root;
         int count = 0;
