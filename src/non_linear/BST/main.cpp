@@ -13,7 +13,7 @@ int main(){
     // std::cout << (str == "1") << std::endl;
     BST<std::string, int> bst;
 
-    // {
+    // /*Get is O(log(N) in average, and O(N) in worst case:)*/ {
     //     Random<int> rand(1000, 9999); // 4 symbols
     //     for(int i = 0; i < 1000; ++i){ // 1000 elements
     //         bst.insert(std::to_string(rand()), (i + 1) * 42);
@@ -38,6 +38,9 @@ int main(){
     bst.insert("6", 6);
     bst.insert("3", 3);
     bst.insert("2", 2);
+
+    bst.get_min() = 22;
+    bst.get_max() = 66;
 
     bst.inorder_traversal();
 }

@@ -145,8 +145,33 @@ public:
 
         return nodes;
     }
-    // Get Min
-    // Get Max
+
+    // Get Min - most left
+    V& get_min(){
+        if(root == nullptr){
+            throw std::out_of_range("Error: BST is empty!");
+        }
+        Node<K, V> * node = root; // copy of pointer
+        // Go left until left is null, i.e. there is no left
+        while(node->left != nullptr){
+            node = node->left;
+        }
+        return node->value;
+    }
+
+    // Get Max - most right
+    V& get_max(){
+        if(root == nullptr){
+            throw std::out_of_range("Error: BST is empty!");
+        }
+        Node<K, V> * node = root; // copy of pointer
+        // Go right until right is null, i.e. there is no right
+        while(node->right != nullptr){
+            node = node->right;
+        }
+        return node->value;
+    }
+
     // Delete
 
 };
