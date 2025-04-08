@@ -39,6 +39,9 @@ int main(){
     bst.insert("3", 3);
     bst.insert("2", 2);
 
+    std::cout << "\n--- Initial BST: ---" << std::endl;
+    bst.hprint(); // sorted by key values
+
     bst.get_min() = 22; // set value
     bst.get_max() = 66;
 
@@ -46,6 +49,9 @@ int main(){
     std::cout << "deleted: " << d.value << std::endl;
 
     bst.inorder_traversal(); // sorted by key values
+
+    std::cout << "\n--- BST after manipulations: ---" << std::endl;
+    bst.hprint(); // sorted by key values
 }
 
 /*

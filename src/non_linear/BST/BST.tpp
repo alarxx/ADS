@@ -28,6 +28,7 @@
 #include <queue>
 #include <set>
 #include <unordered_set>
+#include <iomanip>
 
 template <typename T>
 concept Comparable = requires(T a, T b){
@@ -119,6 +120,19 @@ public:
     }
 
     // print tree? Как можно визуализировать дерево?
+    // Просто способ это рекурсивно вывести горизонтально, сложнее будет вывести вертикально
+    // Horizontal Print
+    private: void hprint(Node<K, V> * node, int spacing){
+        if(node == nullptr){ return; }
+        hprint(node->right, spacing + 1);
+        std::cout << std::setw(spacing * 4) << node->value << std::endl;
+        hprint(node->left, spacing + 1);
+    }
+    // default
+    public: void hprint(){ hprint(root, 0); }
+
+    // Vertical Print
+
     // Inorder Traversal in increasing order (Left - Root - Right), правильный traversal доказывает правильность дерево?
     std::vector<Node<K, V>*> inorder_traversal() const {
         std::vector<Node<K, V>*> nodes;
