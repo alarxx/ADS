@@ -20,7 +20,7 @@
 #include <concepts>
 #include <functional> // std::hash
 #include <cstddef> // std::size_t
-#include <algorithm> // swap
+#include <algorithm> // swap, max
 #include <new> // bad_alloc
 
 #include <vector>
@@ -180,6 +180,14 @@ public:
     public: void hprint(){ hprint(root, 0); }
 
     // Vertical Print
+
+
+    // --- Get Height ---
+    int get_height(){ return get_height(root); }
+    int get_height(Node<K, V> * root){
+        if(root == nullptr){ return 0; }
+        return 1 + std::max(get_height(root->left), get_height(root->right));
+    }
 
 
     // --- Inorder Traversal ---

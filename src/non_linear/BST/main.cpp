@@ -42,6 +42,7 @@ int main(){
 
     std::cout << "\n--- Initial BST: ---" << std::endl;
     bst.hprint(); // sorted by key values
+    std::cout << "Height: " << bst.get_height() << std::endl;
 
     bst.get_min() = 22; // set value
     bst.get_max() = 66;
@@ -56,6 +57,7 @@ int main(){
 
     std::cout << "\n--- BST after manipulations: ---" << std::endl;
     bst.hprint(); // sorted by key values
+    std::cout << "Height: " << bst.get_height() << std::endl;
 
     std::cout << "\n--- BST/main.cpp execution ended! ---" << std::endl;
 }
