@@ -42,6 +42,7 @@ concept Comparable = requires(T a, T b){
 
 template <Comparable K, typename V>
 class BST {
+
 public:
     template <Comparable K_, typename V_>
     class Node {
@@ -63,9 +64,12 @@ public:
         }
     };
 
+private:
     Node<K, V> * root;
 
+public:
     BST() : root(nullptr) {}
+
 
     ~BST() {
         std::stack<Node<K, V>*> stack;
@@ -83,6 +87,8 @@ public:
         }
     }
 
+
+    // --- Insert ---
     Node<K, V>& insert(const K && key, const V && value){
         return insert(key, value); // передаем как lvalue, потому что key и value - имена переменных
     }
@@ -114,6 +120,8 @@ public:
         }
     }
 
+
+    // --- Get ---
     Node<K, V>& get(const K && key){ return get(key); }
     Node<K, V>& get(const K & key){
         if(root == nullptr){
@@ -138,8 +146,11 @@ public:
         return *node;
     }
 
+
+    // --- Printing ---
     // print tree? Как можно визуализировать дерево?
     // Просто способ это рекурсивно вывести горизонтально, сложнее будет вывести вертикально
+
     // Horizontal Print
     private: void hprint(Node<K, V> * node, int spacing){
         if(node == nullptr){ return; }
@@ -152,6 +163,8 @@ public:
 
     // Vertical Print
 
+
+    // --- Inorder Traversal ---
     // Inorder Traversal in increasing order (Left - Root - Right), правильный traversal доказывает правильность дерево?
     std::vector<Node<K, V>*> inorder_traversal() const {
         std::vector<Node<K, V>*> nodes;
@@ -182,7 +195,8 @@ public:
         return nodes;
     }
 
-    // Get Min - most left
+
+    // --- Get Min - most left ---
     V& get_min(){
         if(root == nullptr){
             throw std::out_of_range("Error: BST is empty!");
@@ -195,7 +209,7 @@ public:
         return node->value;
     }
 
-    // Get Max - most right
+    // --- Get Max - most right ---
     V& get_max(){
         if(root == nullptr){
             throw std::out_of_range("Error: BST is empty!");
@@ -208,7 +222,8 @@ public:
         return node->value;
     }
 
-    // Delete
+
+    // --- Delete ---
     Node<K, V> remove(const K& key){
         if(root == nullptr){
             throw std::out_of_range("Error: BST is empty!");
@@ -263,7 +278,6 @@ public:
                 }
             }
         }
-
 
         if(key < parent->key){
             parent->left = replacement;
