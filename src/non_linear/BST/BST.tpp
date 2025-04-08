@@ -28,7 +28,7 @@
 #include <queue>
 #include <set>
 #include <unordered_set>
-#include <iomanip>
+#include <iomanip> // std::setw
 
 template <typename T>
 concept Comparable = requires(T a, T b){
@@ -155,6 +155,24 @@ public:
     private: void hprint(Node<K, V> * node, int spacing){
         if(node == nullptr){ return; }
         hprint(node->right, spacing + 1);
+        /*
+            iomanip - IO Manipulations
+                В основном я использую тут std::setw(amount)
+
+                std::cout.width(5); // можно так сделать
+                std::cout << "BST" << std::endl; // Output: "  BST"
+
+                // std::cout.fill('-'); // Можно так сделать
+                std::cout << std::setfill('-') << std::setw(7) << std::quoted("BST") << std::setw(7) << "BST" << std::endl;
+                // Output: "--"BST"----BST"
+
+                // base: 8, 10, 16
+                std::cout << std::setbase(8) << 8  << std::endl; // 10
+                std::cout << std::setbase(8) << 16 << std::endl; // 20
+                std::cout << std::setbase(8) << 64 << std::endl; // 100
+
+        */
+        // 4 - примерно сколько символов занимает вывод value
         std::cout << std::setw(spacing * 4) << node->value << std::endl;
         hprint(node->left, spacing + 1);
     }
