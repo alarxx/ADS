@@ -39,10 +39,13 @@ int main(){
     bst.insert("3", 3);
     bst.insert("2", 2);
 
-    bst.get_min() = 22;
+    bst.get_min() = 22; // set value
     bst.get_max() = 66;
 
-    bst.inorder_traversal();
+    auto d = bst.remove("3"); // BST<std::string, int>::Node<std::string, int>
+    std::cout << "deleted: " << d.value << std::endl;
+
+    bst.inorder_traversal(); // sorted by key values
 }
 
 /*

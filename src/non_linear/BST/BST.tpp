@@ -173,6 +173,74 @@ public:
     }
 
     // Delete
+    Node<K, V> remove(const K& key){
+        if(root == nullptr){
+            throw std::out_of_range("Error: BST is empty!");
+        }
+
+        // Find `node` and it's `parent`
+        // traverse until `key == node.key`
+        Node<K, V> * parent;
+        Node<K, V> * node = root;
+        while(node != nullptr && node->key != key){
+            parent = node;
+            if(key < parent->key){
+                node = parent->left;
+            }
+            else {
+                node = parent->right;
+            }
+        }
+
+        // Not Found
+        if(node == nullptr){
+            throw std::out_of_range("Error: Key doesn't exist!");
+        }
+
+        // root == null => parent == null
+        // parent == null => root = replacement
+
+        // replace with 1 right and then most left
+        Node<K, V> * replacement = node;
+        if(node->right == nullptr){
+            replacement = node->left; // node->left or nullptr
+        }
+        else {
+            replacement = node->right; // not nullptr
+
+            while(replacement->left != nullptr){
+                Node<K, V> * prev = replacement;
+
+                replacement = replacement->left; // not nullptr
+
+                if(replacement->left == nullptr){
+                    prev->left = replacement->right; // replacement->right or nullptr
+
+                    // replacement->right = nullptr;
+                    // replacement->left = nullptr; // already nullptr
+
+                    replacement->left = node->left;
+                    replacement->right = node->right;
+                    node->left = nullptr;
+                    node->right = nullptr;
+                    // break; // no need, it will break
+                }
+            }
+        }
+
+
+        if(key < parent->key){
+            parent->left = replacement;
+        }
+        else {
+            parent->right = replacement;
+        }
+
+        Node<K, V> d = std::move(*node);
+        delete node;
+
+        return d;
+    }
 
 };
 
