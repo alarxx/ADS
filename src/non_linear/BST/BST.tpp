@@ -180,7 +180,53 @@ public:
     public: void hprint(){ hprint(root, 0); }
 
     // Vertical Print
+    void vprint(){
+        /*
+            height: 3, 2^3=8
+            |(----)(----)(----)(---1)|(----)(----)(----)(----)
+            |(----)(---2)(----)(----)|(----)(---3)(----)(----)
+            |(---4)(----)(---5)(----)|(---6)(----)(---7)(----)
 
+            height: 4, 2^4=16
+            |(----)(----)(----)(----)(----)(----)(----)(---1)(----)(----)(----)(----)(----)(----)(----)(----) - 2^0=1, 16/1=16, 16/2=8, 2^4=16
+            |(----)(----)(----)(---2)(----)(----)(----)(----)(----)(----)(----)(---3)(----)(----)(----)(----) - 2^1=2, 16/2=8,  8/2=4,  2^3=8
+            |(----)(---4)(----)(----)(----)(---5)(----)(----)(----)(---6)(----)(----)(----)(---7)(----)(----) - 2^2=4, 16/4=4,  4/2=2,  2^2=4
+            |(---8)(----)(---9)(----)(--10)(----)(--11)(----)(--12)(----)(--13)(----)(--14)(----)(--15)(----) - 2^3=8, 16/8=2,  2/2=1,  2^1=2
+        */
+        std::queue<Node<K, V>*> queue;
+        queue.push(root);
+
+        int height = get_height();
+        // int max_width = (1 << height); // 2^height: 2^0=1, 2^1=2, 2^2=4, 2^3=8, 2^4=16
+        int symbols = 2;
+        // std::cout << std::setfill('-');
+
+        for(int level = 0; level < height; ++level){
+            int space = (1 << (height - level)) * symbols;
+            int n = (1 << level); // 1 2 4 8 16 ...
+            for(int i = 0; i < n; ++i){
+                if(i == 0){
+                    std::cout << std::setw(space / 2);
+                }
+                else {
+                    std::cout << std::setw(space);
+                }
+                Node<K, V> * node = queue.front();
+                queue.pop();
+                if(node != nullptr){
+                    std::cout << node->value;
+                    queue.push(node->left);
+                    queue.push(node->right);
+                }
+                else {
+                    std::cout << "";
+                    queue.push(nullptr); // left
+                    queue.push(nullptr); // right
+                }
+            }
+            std::cout << std::endl;
+        }
+    }
 
     // --- Get Height ---
     int get_height(){ return get_height(root); }
