@@ -117,31 +117,30 @@ public:
 
     // print tree? Как можно визуализировать дерево?
     // Inorder Traversal in increasing order (Left - Root - Right), правильный traversal доказывает правильность дерево?
-    std::vector<Node<K, V>*> inorder_traversal(){
+    std::vector<Node<K, V>*> inorder_traversal() const {
         std::vector<Node<K, V>*> nodes;
-
         // traversal
         std::stack<Node<K, V>*> stack;
-        std::set<K> has_been;
+        // std::set<K> has_been;
+        Node<K, V> * node = root; // copy of pointer
 
-        if(root != nullptr){
-            stack.push(root); // copy of pointer
-        }
+        while(node != nullptr || !stack.empty()){
+            // get to most left and memorize all intermediate nodes
+            while(node != nullptr){
+                stack.push(node);
+                node = node->left;
+            }
+            // node = nullptr
 
-        while(!stack.empty()){
-            Node<K, V> * node = stack.top(); // copy of pointer
-            if(node->left != nullptr && !has_been.contains(node->left->key)){
-                stack.push(node->left);
-            }
-            else { // node->left == nullptr // i.e. no left children
-                stack.pop();
-                has_been.insert(node->key);
-                nodes.push_back(node); // copy of pointer
-                std::cout << node->value << std::endl;
-                if(node->right != nullptr){
-                    stack.push(node->right);
-                }
-            }
+            // get last left
+            node = stack.top();
+            stack.pop();
+            nodes.push_back(node); // copy of pointer
+            std::cout << node->value << std::endl;
+
+            // get right
+            node = node->right;
+            // if(node->right != nullptr){ stack.push(node->right); }
         }
 
         return nodes;
