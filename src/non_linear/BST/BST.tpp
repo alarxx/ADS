@@ -93,29 +93,30 @@ public:
         return insert(key, value); // передаем как lvalue, потому что key и value - имена переменных
     }
     Node<K, V>& insert(const K & key, const V & value){
-        Node<K, V> * putty = new Node<K, V>(key, value);
         if(root == nullptr){
-            root = putty;
-            return *putty;
+            root = new Node<K, V>(key, value);
+            return *root;
         }
-        else {
-            // traverse until nullptr
-            Node<K, V> * node = root;
-            while(true){
-                if(putty->key < node->key){
-                    if(node->left == nullptr){
-                        node->left = putty;
-                        return *putty;
-                    }
-                    node = node->left;
+        // traverse until nullptr
+        Node<K, V> * node = root;
+        while(true){
+            if(key == node->key){
+                node->value = value;
+                return *node;
+            }
+            else if(key < node->key){
+                if(node->left == nullptr){
+                    node->left = new Node<K, V>(key, value);
+                    return *(node->left);
                 }
-                else {
-                    if(node->right == nullptr){
-                        node->right = putty;
-                        return *putty;
-                    }
-                    node = node->right;
+                node = node->left;
+            }
+            else { // key > node->right
+                if(node->right == nullptr){
+                    node->right = new Node<K, V>(key, value);;
+                    return *(node->right);
                 }
+                node = node->right;
             }
         }
     }
