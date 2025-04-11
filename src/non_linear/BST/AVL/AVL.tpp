@@ -94,6 +94,33 @@ public:
     Node<K, V>& insert(const K && key, const V && value){
         return insert(key, value); // передаем как lvalue, потому что key и value - имена переменных
     }
+    /*
+        Recursive Solution:
+
+            void insert(const K & key, const V & value){
+                root = _insert(root, key, value);
+            }
+
+            Node<K, V> * _insert(Node<K, V> * node, const K & key, const V & value){
+                if(node == nullptr){
+                    return new Node<K, V>(key, value);
+                }
+
+                if(key < node->key){
+                    node->left = _insert(node->left, key, value);
+                }
+                else if(key > node->key){
+                    node->right = _insert(node->right, key, value);
+                }
+                else {
+                    node->value = value;
+                }
+
+                return balance(node);
+            }
+
+        Решение намного короче, но мы не сможем возвращать Node& который внесся или изменился, поэтому я оставляю прошлое решение.
+    */
     Node<K, V>& insert(const K & key, const V & value){
         if(root == nullptr){
             root = new Node<K, V>(key, value);
@@ -145,18 +172,18 @@ public:
             if(child->key < parent->key){ // child is parent->left
                 parent->left = balance(child);
             }
-            else{ // child is parent->right
+            else { // child is parent->right
                 parent->right = balance(child);
             }
 
             child = parent;
             // at the end parent = root, but root itself doesn't change
         }
-
         root = balance(root);
 
         return *node;
     }
+
 
 
     // --- Get ---
@@ -289,7 +316,7 @@ public:
         return bf;
     }
 
-    // --- Rotate Right ---
+    // --- Rotate Right : O(1) ---
     Node<K, V> * rotate_right(Node<K, V> * root){
         Node<K, V> * left = root->left;
         Node<K, V> * tmp = left->right;
@@ -305,7 +332,7 @@ public:
         return left;
     }
 
-    // --- Rotate Left ---
+    // --- Rotate Left : O(1) ---
     Node<K, V> * rotate_left(Node<K, V> * root){
         Node<K, V> * right = root->right;
         Node<K, V> * tmp = right->left;
@@ -321,7 +348,7 @@ public:
         return right;
     }
 
-    // --- Balance ---
+    // --- Balance : O(1) ---
     Node<K, V> * balance(Node<K, V> * node){
         update_height(node);
 
