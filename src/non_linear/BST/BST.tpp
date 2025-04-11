@@ -72,6 +72,7 @@ public:
 
 
     ~BST() {
+        if(root == nullptr){return;}
         std::stack<Node<K, V>*> stack;
         stack.push(root);
         while(!stack.empty()){

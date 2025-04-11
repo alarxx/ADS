@@ -9,6 +9,8 @@
 int main(){
     std::cout << "--- BST/main.cpp execution started! ---" << std::endl;
 
+    BST<std::string, int> empty_bst;
+
     // std::string str = "1";
     // std::cout << (str > "2") << std::endl;
     // std::cout << (str == "1") << std::endl;
