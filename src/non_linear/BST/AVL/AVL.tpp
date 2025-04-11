@@ -49,6 +49,7 @@ public:
     public:
         K_ key;
         V_ value;
+        int height;
         Node<K_, V_> *left, *right;
         /*
         What does `Object& &&` mean?
@@ -57,7 +58,7 @@ public:
         Object && &  = Object &
         Object && && = Object &&
         */
-        Node(const K_ & key, const V_ & value) : key(key), value(value) {} // 1 copy
+        Node(const K_ & key, const V_ & value, int height = 1) : key(key), value(value), height(height), left(nullptr), right(nullptr) {} // 1 copy
         Node(const K_ && key, const V_ && value) = delete;
         ~Node(){
             std::cout << "Node Destructor: key = " << key << ", value = " << value << std::endl;
@@ -72,6 +73,7 @@ public:
 
 
     ~AVL() {
+        if(root == nullptr){ return; }
         std::stack<Node<K, V>*> stack;
         stack.push(root);
         while(!stack.empty()){
@@ -93,31 +95,67 @@ public:
         return insert(key, value); // передаем как lvalue, потому что key и value - имена переменных
     }
     Node<K, V>& insert(const K & key, const V & value){
-        Node<K, V> * putty = new Node<K, V>(key, value);
         if(root == nullptr){
-            root = putty;
-            return *putty;
+            root = new Node<K, V>(key, value);
+            return *root;
         }
-        else {
-            // traverse until nullptr
-            Node<K, V> * node = root;
-            while(true){
-                if(putty->key < node->key){
-                    if(node->left == nullptr){
-                        node->left = putty;
-                        return *putty;
-                    }
+
+        // traverse until nullptr
+        Node<K, V> * node = root;
+
+        std::stack<Node<K, V>*> stack;
+
+        // O(log(N))
+        while(true){
+            stack.push(node);
+
+            if(key == node->key){
+                node->value = value;
+                return *node;
+            }
+
+            if(key < node->key){
+                if(node->left == nullptr){
+                    node->left = new Node<K, V>(key, value);
+                    // return *(node->left);
                     node = node->left;
+                    break;
                 }
-                else {
-                    if(node->right == nullptr){
-                        node->right = putty;
-                        return *putty;
-                    }
+                node = node->left;
+            }
+            else { // key > node->right
+                if(node->right == nullptr){
+                    node->right = new Node<K, V>(key, value);;
+                    // return *(node->right);
                     node = node->right;
+                    break;
                 }
+                node = node->right;
             }
         }
+
+        // O(log(N))
+        // path снизу вверх к root-у
+        Node<K, V> * child = node;
+        Node<K, V> * parent = nullptr;
+        while(!stack.empty()){
+            parent = stack.top();
+            stack.pop();
+
+            if(child->key < parent->key){ // child is parent->left
+                parent->left = balance(child);
+            }
+            else{ // child is parent->right
+                parent->right = balance(child);
+            }
+
+            child = parent;
+            // at the end parent = root, but root itself doesn't change
+        }
+
+        root = balance(root);
+
+        return *node;
     }
 
 
@@ -228,11 +266,87 @@ public:
         }
     }
 
-    // --- Get Height ---
+    // --- Get Height Recursively ---
     int get_height(){ return get_height(root); }
     int get_height(Node<K, V> * root){
         if(root == nullptr){ return 0; }
         return 1 + std::max(get_height(root->left), get_height(root->right));
+    }
+
+
+    // --- AVL Functions ---
+    int height(const Node<K, V> * node) const {
+        return node == nullptr ? 0 : node->height;
+    }
+
+    void update_height(Node<K, V> * node) {
+        node->height = 1 + std::max(height(node->left), height(node->right));
+    }
+
+    int balance_factor(const Node<K, V> * node){
+        int bf = height(node->left) - height(node->right);
+        // std::cout << "BF: " << bf << std::endl;
+        return bf;
+    }
+
+    // --- Rotate Right ---
+    Node<K, V> * rotate_right(Node<K, V> * root){
+        Node<K, V> * left = root->left;
+        Node<K, V> * tmp = left->right;
+
+        // rotation
+        left->right = root;
+        root->left = tmp;
+
+        // update heights, order matters
+        update_height(root); // first update right subtree
+        update_height(left); // then update new root's height
+
+        return left;
+    }
+
+    // --- Rotate Left ---
+    Node<K, V> * rotate_left(Node<K, V> * root){
+        Node<K, V> * right = root->right;
+        Node<K, V> * tmp = right->left;
+
+        // rotation
+        right->left = root;
+        root->right = tmp;
+
+        // update heights, update order matters
+        update_height(root); // first update left subtree
+        update_height(right); // then update new root's height
+
+        return right;
+    }
+
+    // --- Balance ---
+    Node<K, V> * balance(Node<K, V> * node){
+        update_height(node);
+
+        int bf = balance_factor(node); // height(left) - height(right)
+
+        // L
+        if(bf > 1){ // left > right, i.e. left tree is unbalanced
+            // R
+            if(balance_factor(node->left) < 0){ // left - right
+                rotate_left(node->left);
+            }
+            // L, balance_factor(node->left) >= 0
+            return rotate_right(node);
+        }
+        // R
+        else if(bf < -1){ // i.e. left < right, i.e. right tree is unbalanced
+            // L
+            if(balance_factor(node->right) > 0){ // // left - right
+                rotate_right(node->right);
+            }
+            // R, balance_factor(node->right) <= 0
+            return rotate_left(node);
+        }
+
+        return node; // already balanced
     }
 
 
