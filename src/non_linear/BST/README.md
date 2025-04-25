@@ -8,6 +8,10 @@
 - [x] Insert
 - [x] Remove
 
+Check balancing trees implementation:
+- [AVL Tree](https://github.com/alarxx/ADS/tree/c++/src/non_linear/BST/AVL)
+- [Red-Black Tree](https://github.com/alarxx/ADS/tree/c++/src/non_linear/BST/Red_Black_Tree)
+
 ---
 
 ### References
