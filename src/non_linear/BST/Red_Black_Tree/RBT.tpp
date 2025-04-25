@@ -14,6 +14,12 @@
 #ifndef _RBT_TPP_
 #define _RBT_TPP_
 
+/*
+
+https://www.cs.usfca.edu/~galles/visualization/RedBlack.html
+
+*/
+
 #include <iostream>
 #include <stdexcept> // runtime_error, out_of_range
 #include <type_traits>
@@ -49,7 +55,7 @@ public:
     public:
         K_ key;
         V_ value;
-        int height;
+        bool is_black;
         Node<K_, V_> *left, *right;
         /*
         What does `Object& &&` mean?
@@ -58,10 +64,10 @@ public:
         Object && &  = Object &
         Object && && = Object &&
         */
-        Node(const K_ & key, const V_ & value, int height = 1) : key(key), value(value), height(height), left(nullptr), right(nullptr) {} // 1 copy
+        Node(const K_ & key, const V_ & value, bool is_black = false /*red by default*/) : key(key), value(value), is_black(is_black), left(nullptr), right(nullptr) {} // 1 copy
         Node(const K_ && key, const V_ && value) = delete;
         ~Node(){
-            std::cout << "Node Destructor: key = " << key << ", value = " << value << std::endl;
+            // std::cout << "Node Destructor: key = " << key << ", value = " << value << std::endl;
         }
     };
 
@@ -70,7 +76,6 @@ private:
 
 public:
     RBT() : root(nullptr) {}
-
 
     ~RBT() {
         if(root == nullptr){ return; }
@@ -89,52 +94,39 @@ public:
         }
     }
 
-
-    // --- Insert ---
-    Node<K, V>& insert(const K && key, const V && value){
-        return insert(key, value); // передаем как lvalue, потому что key и value - имена переменных
+public:
+    bool is_red(Node<K, V> * node) const {
+        return node != nullptr && !node->is_black;
     }
-    /*
-        Recursive Solution:
 
-            void insert(const K & key, const V & value){
-                root = _insert(root, key, value);
-            }
 
-            Node<K, V> * _insert(Node<K, V> * node, const K & key, const V & value){
-                if(node == nullptr){
-                    return new Node<K, V>(key, value);
-                }
+    void flip_colors(Node<K, V> * grandparent) {
+        grandparent->is_black = false; // !grandparent->is_black;
+        if(grandparent->left  != nullptr) grandparent->left->is_black  = true; // !grandparent->left->is_black;
+        if(grandparent->right != nullptr) grandparent->right->is_black = true; // !grandparent->right->is_black;
+    }
 
-                if(key < node->key){
-                    node->left = _insert(node->left, key, value);
-                }
-                else if(key > node->key){
-                    node->right = _insert(node->right, key, value);
-                }
-                else {
-                    node->value = value;
-                }
+public:
+    // --- Insert ---
+    Node<K, V>& insert(const K && key, const V && value, bool print = false){
+        return insert(key, value, print); // передаем как lvalue, потому что key и value - имена переменных
+    }
 
-                return balance(node);
-            }
-
-        Решение намного короче, но мы не сможем возвращать Node& который внесся или изменился, поэтому я оставляю прошлое решение.
-    */
-    Node<K, V>& insert(const K & key, const V & value){
+    Node<K, V>& insert(const K & key, const V & value, bool print = false){
         if(root == nullptr){
-            root = new Node<K, V>(key, value);
+            root = new Node<K, V>(key, value, true);
             return *root;
         }
 
         // traverse until nullptr
         Node<K, V> * node = root;
 
-        std::stack<Node<K, V>*> stack;
+        std::vector<Node<K, V>*> path;
+        // stack.reserve(2 * log2(N + 1)); // log is hard operation to calculate
 
         // O(log(N))
         while(true){
-            stack.push(node);
+            path.push_back(node);
 
             if(key == node->key){
                 node->value = value;
@@ -143,7 +135,7 @@ public:
 
             if(key < node->key){
                 if(node->left == nullptr){
-                    node->left = new Node<K, V>(key, value);
+                    node->left = new Node<K, V>(key, value, false); // red
                     // return *(node->left);
                     node = node->left;
                     break;
@@ -152,7 +144,7 @@ public:
             }
             else { // key > node->right
                 if(node->right == nullptr){
-                    node->right = new Node<K, V>(key, value);;
+                    node->right = new Node<K, V>(key, value, false); // red
                     // return *(node->right);
                     node = node->right;
                     break;
@@ -161,30 +153,106 @@ public:
             }
         }
 
+        path.push_back(node);
+
+        if(path.size() < 3){ return *node; }
+
         // O(log(N))
         // path снизу вверх к root-у
-        Node<K, V> * child = node;
-        Node<K, V> * parent = nullptr;
-        while(!stack.empty()){
-            parent = stack.top();
-            stack.pop();
+        Node<K, V> * grandgrandparent   = nullptr;
+        Node<K, V> * grandparent        = nullptr;
+        Node<K, V> * parent             = nullptr;
+        Node<K, V> * child              = nullptr; // actually could be node
 
-            if(child->key < parent->key){ // child is parent->left
-                parent->left = balance(child);
+        // child is red
+        // if(!is_red(parent)) return *node;
+        if(print) { vprint(); std::cout << "---" << std::endl; }
+
+        while(path.size() >= 4){
+            grandgrandparent    = path[path.size() - 4];
+            grandparent         = path[path.size() - 3];
+            parent              = path[path.size() - 2];
+            child               = path[path.size() - 1];
+
+            path.pop_back();
+
+            if(grandparent->key < grandgrandparent->key){ // child is parent->left
+                grandgrandparent->left  = balance(grandparent, parent, child);
+                if(print) { vprint(); std::cout << "---" << std::endl; }
+                if(!is_red(grandgrandparent->left)){
+                    /*
+                        Вращения возможны только единожды, после этого баланс восстановлен.
+                        Push redness up / blackness down, возможно множество раз и они не меняют структуру дерева,
+                        поэтому мы можем подниматься по path.
+                        НО, если мы сделали вращение, то структура изменится и идти наверх по path не получится,
+                        потому что parent-child relationship нарушится.
+                    */
+                    return *node;
+                }
             }
             else { // child is parent->right
-                parent->right = balance(child);
+                grandgrandparent->right = balance(grandparent, parent, child);
+                if(print) { vprint(); std::cout << "---" << std::endl; }
+                if(!is_red(grandgrandparent->right)){
+                    return *node;
+                }
             }
-
-            child = parent;
-            // at the end parent = root, but root itself doesn't change
         }
-        root = balance(root);
+        std::cout << "root" << std::endl;
+        parent      = path[path.size() - 2];
+        child       = path[path.size() - 1];
+        root = balance(root, parent, child);
+        root->is_black = true;
+
+        if(print) { vprint(); std::cout << "---" << std::endl; }
 
         return *node;
     }
 
+    Node<K, V> * balance(Node<K, V> * grandparent, Node<K, V> * parent, Node<K, V> * child){
+        // return grandparent;
 
+        std::cout << "grandparent: "    << grandparent->value   << (grandparent->is_black   ? "B" : "R")  << std::endl;
+        std::cout << "parent: "         << parent->value        << (parent->is_black        ? "B" : "R")  << std::endl;
+        std::cout << "child: "          << child->value         << (child->is_black         ? "B" : "R")  << std::endl;
+
+        if(!is_red(parent) || !is_red(child)){
+            std::cout << std::boolalpha;
+            std::cout << "(nothing) : is_red(parent) = " << is_red(parent) << ", is_red(child) = " << is_red(child) << std::endl;
+            return grandparent;
+        }
+        else {
+            std::cout << "(something) : is_red(parent) = " << is_red(parent) << ", is_red(child) = " << is_red(child) << std::endl;
+        }
+
+        bool is_parent_right = parent->key > grandparent->key;
+        Node<K, V> * uncle = is_parent_right ? grandparent->left : grandparent->right;
+        std::cout << "uncle: " << (uncle != nullptr ? uncle->value : "") << (uncle != nullptr ? (uncle->is_black ? "B" : "R") : "")  << std::endl;
+
+        if(is_red(parent) && is_red(uncle)){
+            std::cout << "flip" << std::endl;
+            flip_colors(grandparent);
+            return grandparent;
+        }
+
+        else if(is_parent_right){
+            if(child->key < parent->key){ // Right Left Zig-Zag
+                // if(is_parent_right)
+                grandparent->right = rotate_right(parent);
+                // else grandparent->left = rotate_right(parent);
+            }
+            return rotate_left(grandparent);
+        }
+
+        else {
+            if(child->key > parent->key){ // Left Right Zig-Zag
+                // if(is_parent_right) grandparent->right = rotate_left(parent);
+                // else
+                grandparent->left = rotate_left(parent);
+            }
+            return rotate_right(grandparent);
+        }
+    }
 
     // --- Get ---
     Node<K, V>& get(const K && key){ return get(key); }
@@ -238,7 +306,7 @@ public:
 
         */
         // 4 - примерно сколько символов занимает вывод value
-        std::cout << std::setw(spacing * 4) << node->value << std::endl;
+        std::cout << std::setw(spacing * 4) << node->value << (node->is_black ? "B" : "R") << std::endl;
         hprint(node->left, spacing + 1);
     }
     // default
@@ -263,7 +331,7 @@ public:
 
         int height = get_height();
         // int max_width = (1 << height); // 2^height: 2^0=1, 2^1=2, 2^2=4, 2^3=8, 2^4=16
-        int symbols = 2;
+        int symbols = 4;
         // std::cout << std::setfill('-');
 
         for(int level = 0; level < height; ++level){
@@ -279,7 +347,7 @@ public:
                 Node<K, V> * node = queue.front();
                 queue.pop();
                 if(node != nullptr){
-                    std::cout << node->value;
+                    std::cout << node->value << (node->is_black ? "B" : "R");
                     queue.push(node->left);
                     queue.push(node->right);
                 }
@@ -293,6 +361,7 @@ public:
         }
     }
 
+
     // --- Get Height Recursively ---
     int get_height(){ return get_height(root); }
     int get_height(Node<K, V> * root){
@@ -301,23 +370,9 @@ public:
     }
 
 
-    // --- AVL Functions ---
-    int height(const Node<K, V> * node) const {
-        return node == nullptr ? 0 : node->height;
-    }
-
-    void update_height(Node<K, V> * node) {
-        node->height = 1 + std::max(height(node->left), height(node->right));
-    }
-
-    int balance_factor(const Node<K, V> * node){
-        int bf = height(node->left) - height(node->right);
-        // std::cout << "BF: " << bf << std::endl;
-        return bf;
-    }
-
     // --- Rotate Right : O(1) ---
     Node<K, V> * rotate_right(Node<K, V> * root){
+        std::cout << "rotate_right" << std::endl;
         Node<K, V> * left = root->left;
         Node<K, V> * tmp = left->right;
 
@@ -326,14 +381,19 @@ public:
         root->left = tmp;
 
         // update heights, order matters
-        update_height(root); // first update right subtree
-        update_height(left); // then update new root's height
+        // update_height(root); // first update right subtree
+        // update_height(left); // then update new root's height
+
+        // push redness down
+        left->is_black = true; // black
+        root->is_black = false; // red
 
         return left;
     }
 
     // --- Rotate Left : O(1) ---
     Node<K, V> * rotate_left(Node<K, V> * root){
+        std::cout << "rotate_left" << std::endl;
         Node<K, V> * right = root->right;
         Node<K, V> * tmp = right->left;
 
@@ -342,38 +402,14 @@ public:
         root->right = tmp;
 
         // update heights, update order matters
-        update_height(root); // first update left subtree
-        update_height(right); // then update new root's height
+        // update_height(root); // first update left subtree
+        // update_height(right); // then update new root's height
+
+        // push redness down
+        right->is_black = true; // black
+        root->is_black = false; // red
 
         return right;
-    }
-
-    // --- Balance : O(1) ---
-    Node<K, V> * balance(Node<K, V> * node){
-        update_height(node);
-
-        int bf = balance_factor(node); // height(left) - height(right)
-
-        // L
-        if(bf > 1){ // left > right, i.e. left tree is unbalanced
-            // R
-            if(balance_factor(node->left) < 0){ // left - right
-                rotate_left(node->left);
-            }
-            // L, balance_factor(node->left) >= 0
-            return rotate_right(node);
-        }
-        // R
-        else if(bf < -1){ // i.e. left < right, i.e. right tree is unbalanced
-            // L
-            if(balance_factor(node->right) > 0){ // // left - right
-                rotate_right(node->right);
-            }
-            // R, balance_factor(node->right) <= 0
-            return rotate_left(node);
-        }
-
-        return node; // already balanced
     }
 
 
@@ -422,6 +458,7 @@ public:
         return node->value;
     }
 
+
     // --- Get Max - most right ---
     V& get_max(){
         if(root == nullptr){
@@ -436,7 +473,7 @@ public:
     }
 
 
-    // --- Delete ---
+    // --- Delete (BST) ---
     Node<K, V> remove(const K& key){
         if(root == nullptr){
             throw std::out_of_range("Error: BST is empty!");
