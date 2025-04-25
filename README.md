@@ -10,4 +10,6 @@ pic ref: https://dotnettutorials.net/lesson/physical-vs-logical-data-structure/
 ---
 
 # References
+
+- Astana IT University Lectures. Askar Khaimuldin.
 - Sedgewick, R., & Wayne, K. (2011). Algorithms. Addison-wesley professional.
