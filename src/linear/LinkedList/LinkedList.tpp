@@ -132,9 +132,16 @@ public:
         return addLast(new_node);
     }
     T& addLast(T && rvalue){ // 0 copy, 1 rvalue object
+        /*
+            ll.addLast(String("A"));
+                -> String Constructor(A)
+                -> Node rvalue Constructor
+                -> String Move Assignment Operator
+                -> ~String {nullstr0}
+        */
         // std::cout << "addLast(rvalue) (1)" << std::endl;
+        // T item = std::move(rvalue); // 1 object which is stealed
         Node<T> * new_node = new Node(std::move(rvalue)); // 0 copy object
-        // rvalue now is stealed
         // std::cout << "addLast(rvalue) (2)" << std::endl;
         return addLast(new_node);
     }
