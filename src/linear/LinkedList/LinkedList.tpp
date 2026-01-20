@@ -248,6 +248,32 @@ public:
         return data;
     }
 
+    // --- remove ---
+public:
+    bool remove(const T& item) {
+        Node<T>* node = _head;
+
+        while (node != nullptr) {
+            if (node->data == item) {
+                Node<T>* prev = node->prev;
+                Node<T>* next = node->next;
+
+                if (prev) prev->next = next;
+                else _head = next;
+
+                if (next) next->prev = prev;
+                else _tail = prev;
+
+                delete node;
+                node = nullptr;
+                --_size;
+
+                return true;
+            }
+            node = node->next;
+        }
+        return false;
+    }
     // ------
 
 
