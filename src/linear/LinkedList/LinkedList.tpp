@@ -125,15 +125,17 @@ private:
     }
 public:
     T& addLast(T & lvalue){ // 1 copy
-        // std::cout << "addLast(lvalue)" << std::endl;
-        T item = lvalue; // copy
+        // std::cout << "addLast(lvalue) (1)" << std::endl;
+        T item = lvalue; // explicitly making copy
         Node<T> * new_node = new Node(std::move(item));
+        // std::cout << "addLast(lvalue) (2)" << std::endl;
         return addLast(new_node);
     }
     T& addLast(T && rvalue){ // 0 copy, 1 rvalue object
-        // std::cout << "addLast(rvalue)" << std::endl;
-        // T item = std::move(rvalue); // 1 object which is stealed
-        Node<T> * new_node = new Node(std::move(rvalue)); // 1 copy object
+        // std::cout << "addLast(rvalue) (1)" << std::endl;
+        Node<T> * new_node = new Node(std::move(rvalue)); // 0 copy object
+        // rvalue now is stealed
+        // std::cout << "addLast(rvalue) (2)" << std::endl;
         return addLast(new_node);
     }
 
